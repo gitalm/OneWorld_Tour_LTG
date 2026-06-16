@@ -12,22 +12,25 @@
     <div id="cesiumContainer"></div>
     <script>
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
+// ... in deinem script Bereich:
+const viewer = new Cesium.Viewer('cesiumContainer', {
+    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+    }),
+    terrainProvider: Cesium.Terrain.fromWorldTerrain(), // Hier die Änderung!
+    baseLayerPicker: false
+});
 
-        const viewer = new Cesium.Viewer('cesiumContainer', {
-            // Nutze die Standard-OSM-Gebäude direkt als Funktion
-            terrainProvider: Cesium.createWorldTerrain()
-        });
-
-        // Gebäude laden - diese Funktion ist robuster bei 403-Fehlern
-        async function loadBuildings() {
-            try {
-                const buildings = await Cesium.createOsmBuildingsAsync();
-                viewer.scene.primitives.add(buildings);
-            } catch (error) {
-                console.error("Fehler beim Laden der Gebäude:", error);
-            }
-        }
-        loadBuildings();
+// Gebäude laden (wichtig: dies ist asynchron)
+async function setupScene() {
+    try {
+        const buildings = await Cesium.createOsmBuildingsAsync();
+        viewer.scene.primitives.add(buildings);
+    } catch (error) {
+        console.error("Gebäude konnten nicht geladen werden:", error);
+    }
+}
+setupScene();
     </script>
 </body>
 </html>
