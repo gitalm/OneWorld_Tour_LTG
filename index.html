@@ -5,13 +5,26 @@
     <title>One World Tour</title>
     <script src="./Cesium/Cesium.js"></script>
     <link href="./Cesium/Widgets/widgets.css" rel="stylesheet">
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY
+    <style>
+        body, html, #cesiumContainer { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        
+        #navButton { 
+            position: absolute; top: 30px; left: 30px; z-index: 9999;
+            padding: 15px 30px; font-size: 20px; font-family: sans-serif;
+            background: #2c3e50; color: white; border: 2px solid #ecf0f1;
+            border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #navButton:hover { background: #34495e; }
+
+        #overlayImg { 
+            position: absolute; bottom: 30px; right: 30px; width: 300px; 
+            display: none; border: 4px solid white; border-radius: 10px; 
+            transition: opacity 1s; opacity: 0; z-index: 9998; 
+        }
+    </style>
 </head>
 <body>
-    <div id="ui">
-        <h2>One World Musikreise</h2>
-        <p>Drücke die <b>Leertaste</b> für den nächsten Stopp</p>
-    </div>
+    <button id="navButton">Nächster Stopp</button>
     <img id="overlayImg" src="">
     <div id="cesiumContainer"></div>
 
@@ -23,22 +36,20 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny0
             viewer = new Cesium.Viewer('cesiumContainer', {
                 terrainProvider: await Cesium.createWorldTerrainAsync({ assetId: 1 }),
                 baseLayerPicker: false,
+                fullscreenButton: false, // Wir nutzen eigenes UI
                 animation: false,
-                timeline: false,
-                fullscreenButton: false
+                timeline: false
             });
-            const buildings = await Cesium.createOsmBuildingsAsync();
-            viewer.scene.primitives.add(buildings);
+            // Gebäude laden
+            viewer.scene.primitives.add(await Cesium.createOsmBuildingsAsync());
             
-            // Start-Ansicht: Höher (5000m) für besseren Überblick
-            viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(12.348358, 47.85701, 5000)
-            });
+            // Startansicht
+            viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(12.348358, 47.85701, 5000) });
         }
 
         const stops = [
             { name: "Dublin", pos: [-6.2603, 53.3498, 1200], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
-            { name: "Rio de Janeiro", pos: [-43.2105, -22.9519, 1500], img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJ4ZzNqZ2J4ZzNqZ2J4ZzNqZ2J4ZzNqZ2J4ZzNqZ2J4ZzNqJmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lTjJp9hYyO1T1e/giphy.gif" },
+            { name: "Rio de Janeiro", pos: [-43.2105, -22.9519, 1500], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
             { name: "Schule", pos: [12.348358, 47.85701, 5000], img: "" }
         ];
 
@@ -46,6 +57,9 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny0
         function nextStop() {
             const stop = stops[i];
             const overlay = document.getElementById('overlayImg');
+            const btn = document.getElementById('navButton');
+            
+            btn.innerText = "Reise nach: " + stop.name;
             
             if (stop.img) {
                 overlay.src = stop.img;
@@ -56,13 +70,15 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny0
             
             viewer.camera.flyTo({
                 destination: Cesium.Cartesian3.fromDegrees(stop.pos[0], stop.pos[1], stop.pos[2]),
-                orientation: { pitch: Cesium.Math.toRadians(-35.0), roll: 0.0 },
+                orientation: { pitch: Cesium.Math.toRadians(-30.0), roll: 0.0 },
                 duration: 12
             });
             i = (i + 1) % stops.length;
         }
 
+        document.getElementById('navButton').addEventListener('click', nextStop);
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
+        
         init();
     </script>
 </body>
