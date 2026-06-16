@@ -21,43 +21,67 @@
         // Token setzen
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
 
+        let viewer;
+
         async function init() {
-            // Viewer-Initialisierung
-            const viewer = new Cesium.Viewer('cesiumContainer', {
-                terrainProvider: await Cesium.createWorldTerrainAsync(),
-                baseLayerPicker: false
-            });
+            try {
+                // Viewer mit World Terrain (Asset 1)
+                viewer = new Cesium.Viewer('cesiumContainer', {
+                    terrainProvider: await Cesium.createWorldTerrainAsync({ assetId: 1 }),
+                    baseLayerPicker: false,
+                    animation: false,
+                    timeline: false
+                });
 
-            // OSM Gebäude als Asset 96188
-            const buildings = await Cesium.createOsmBuildingsAsync();
-            viewer.scene.primitives.add(buildings);
-
-            window.viewer = viewer;
+                // OSM Gebäude (Asset 96188)
+                const buildings = await Cesium.createOsmBuildingsAsync();
+                viewer.scene.primitives.add(buildings);
+            } catch (error) {
+                console.error("Fehler bei der Initialisierung:", error);
+            }
         }
 
         const stops = [
             { name: "Dublin", pos: [-6.2603, 53.3498, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
-            { name: "Copacabana", pos: [-43.1770, -22.9711, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" }
+            { name: "Rio de Janeiro", pos: [-43.2105, -22.9519, 1000], img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJ4ZzNqZ2J4ZzNqZ2J4ZzNqZ2J4ZzNqZ2J4ZzNqZ2J4ZzNqJmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lTjJp9hYyO1T1e/giphy.gif" }
         ];
 
         let i = 0;
         function nextStop() {
+            if (!viewer) return;
+
             const stop = stops[i];
             const overlay = document.getElementById('overlayImg');
+            
+            // Bild einblenden
             overlay.src = stop.img;
             overlay.style.display = 'block';
             setTimeout(() => { overlay.style.opacity = '1'; }, 50);
-            
-            window.viewer.camera.flyTo({
+
+            // Flug ausführen
+            viewer.camera.flyTo({
                 destination: Cesium.Cartesian3.fromDegrees(stop.pos[0], stop.pos[1], stop.pos[2]),
-                orientation: { pitch: Cesium.Math.toRadians(-45.0) },
-                duration: 5
+                orientation: { 
+                    pitch: Cesium.Math.toRadians(-30.0), 
+                    roll: 0.0 
+                },
+                duration: 12
             });
+
+            // Bild nach 10 Sekunden automatisch ausblenden
+            setTimeout(() => { 
+                overlay.style.opacity = '0'; 
+                setTimeout(() => { overlay.style.display = 'none'; }, 1000); 
+            }, 10000);
+
             i = (i + 1) % stops.length;
         }
 
-        document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
-        
+        // Event: Leertaste für nächsten Stopp
+        document.addEventListener('keydown', (e) => { 
+            if (e.code === 'Space') nextStop(); 
+        });
+
         init();
     </script>
 </body>
