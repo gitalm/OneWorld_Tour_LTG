@@ -13,41 +13,50 @@
 <body>
     <img id="overlayImg" src="">
     <div id="cesiumContainer"></div>
-    <script>
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
+<script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
 
+    async function init() {
+        // Terrain laden
+        const terrain = await Cesium.createWorldTerrainAsync({ assetId: 1 });
+        
         const viewer = new Cesium.Viewer('cesiumContainer', {
-            terrainProvider: Cesium.Terrain.fromIonAssetId(1), // Dein Terrain Asset
+            terrainProvider: terrain,
             baseLayerPicker: false
         });
 
-        // Gebäude explizit mit deiner Asset ID 96188 laden
-        viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
-            url: Cesium.IonResource.fromAssetId(96188)
-        }));
+        // Gebäude laden
+        try {
+            const buildings = await Cesium.Cesium3DTileset.fromIonAssetId(96188);
+            viewer.scene.primitives.add(buildings);
+        } catch (e) { console.error("Gebäude-Fehler:", e); }
 
-        const stops = [
-            { name: "Dublin", pos: [-6.2603, 53.3498, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
-            { name: "Copacabana", pos: [-43.1770, -22.9711, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" }
-        ];
+        window.viewer = viewer; // Global machen für die Steuerung
+    }
 
-        let i = 0;
-        function nextStop() {
-            const stop = stops[i];
-            const overlay = document.getElementById('overlayImg');
-            overlay.src = stop.img;
-            overlay.style.display = 'block';
-            setTimeout(() => { overlay.style.opacity = '1'; }, 50);
-            
-            viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(stop.pos[0], stop.pos[1], stop.pos[2]),
-                orientation: { pitch: Cesium.Math.toRadians(-45.0) },
-                duration: 5
-            });
-            i = (i + 1) % stops.length;
-        }
+    const stops = [
+        { name: "Dublin", pos: [-6.2603, 53.3498, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
+        { name: "Copacabana", pos: [-43.1770, -22.9711, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" }
+    ];
 
-        document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
-    </script>
+    let i = 0;
+    function nextStop() {
+        const stop = stops[i];
+        const overlay = document.getElementById('overlayImg');
+        overlay.src = stop.img;
+        overlay.style.display = 'block';
+        setTimeout(() => { overlay.style.opacity = '1'; }, 50);
+        
+        window.viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(stop.pos[0], stop.pos[1], stop.pos[2]),
+            orientation: { pitch: Cesium.Math.toRadians(-45.0) },
+            duration: 5
+        });
+        i = (i + 1) % stops.length;
+    }
+
+    document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
+    init();
+</script>
 </body>
 </html>
