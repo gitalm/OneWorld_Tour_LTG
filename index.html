@@ -2,35 +2,55 @@
 <html lang="de">
 <head>
     <meta charset="utf-8">
+    <title>One World Tour</title>
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <style>
         body, html, #cesiumContainer { width: 100%; height: 100%; margin: 0; padding: 0; }
+        #overlayImg { position: absolute; bottom: 30px; right: 30px; width: 300px; display: none; border: 4px solid white; border-radius: 10px; transition: opacity 1s; opacity: 0; }
     </style>
 </head>
 <body>
+    <img id="overlayImg" src="">
     <div id="cesiumContainer"></div>
     <script>
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
-// ... in deinem script Bereich:
-const viewer = new Cesium.Viewer('cesiumContainer', {
-    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
-    }),
-    terrainProvider: Cesium.Terrain.fromWorldTerrain(), // Hier die Änderung!
-    baseLayerPicker: false
-});
+        Cesium.Ion.defaultAccessToken = 'DEIN_TOKEN_HIER';
 
-// Gebäude laden (wichtig: dies ist asynchron)
-async function setupScene() {
-    try {
-        const buildings = await Cesium.createOsmBuildingsAsync();
-        viewer.scene.primitives.add(buildings);
-    } catch (error) {
-        console.error("Gebäude konnten nicht geladen werden:", error);
-    }
-}
-setupScene();
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider: Cesium.Terrain.fromWorldTerrain(),
+            baseLayerPicker: false
+        });
+
+        const stops = [
+            { name: "Dublin", pos: [-6.2603, 53.3498, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
+            { name: "Copacabana", pos: [-43.1770, -22.9711, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" }
+        ];
+
+        let i = 0;
+        async function nextStop() {
+            const stop = stops[i];
+            const overlay = document.getElementById('overlayImg');
+            overlay.src = stop.img;
+            overlay.style.display = 'block';
+            setTimeout(() => { overlay.style.opacity = '1'; }, 50);
+            
+            viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(stop.pos[0], stop.pos[1], stop.pos[2]),
+                orientation: { pitch: Cesium.Math.toRadians(-45.0) },
+                duration: 5
+            });
+            i = (i + 1) % stops.length;
+        }
+
+        async function init() {
+            try {
+                const buildings = await Cesium.createOsmBuildingsAsync();
+                viewer.scene.primitives.add(buildings);
+            } catch (e) { console.error("Gebäude-Fehler:", e); }
+        }
+        
+        document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
+        init();
     </script>
 </body>
 </html>
