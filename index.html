@@ -14,18 +14,19 @@
             background: #2c3e50; color: white; border: 2px solid #ecf0f1;
             border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        #navButton:hover { background: #34495e; }
-
-        #overlayImg { 
-            position: absolute; bottom: 30px; right: 30px; width: 300px; 
+        
+        #overlayVideo { 
+            position: absolute; bottom: 30px; right: 30px; width: 400px; 
             display: none; border: 4px solid white; border-radius: 10px; 
             transition: opacity 1s; opacity: 0; z-index: 9998; 
         }
     </style>
 </head>
 <body>
-    <button id="navButton">Nächster Stopp</button>
-    <img id="overlayImg" src="">
+    <button id="navButton">Start: One World Tour</button>
+    <video id="overlayVideo" muted loop playsinline autoplay>
+        <source src="" type="video/mp4">
+    </video>
     <div id="cesiumContainer"></div>
 
     <script type="module">
@@ -36,36 +37,41 @@
             viewer = new Cesium.Viewer('cesiumContainer', {
                 terrainProvider: await Cesium.createWorldTerrainAsync({ assetId: 1 }),
                 baseLayerPicker: false,
-                fullscreenButton: false, // Wir nutzen eigenes UI
+                fullscreenButton: false,
                 animation: false,
                 timeline: false
             });
-            // Gebäude laden
             viewer.scene.primitives.add(await Cesium.createOsmBuildingsAsync());
-            
-            // Startansicht
             viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(12.348358, 47.85701, 5000) });
         }
 
         const stops = [
-            { name: "Dublin", pos: [-6.2603, 53.3498, 1200], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
-            { name: "Rio de Janeiro", pos: [-43.2105, -22.9519, 1500], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
-            { name: "Schule", pos: [12.348358, 47.85701, 5000], img: "" }
+            { name: "Dublin", pos: [-6.2603, 53.3498, 1200], video: "dublin.mp4" },
+            { name: "Rio de Janeiro", pos: [-43.2105, -22.9519, 1500], video: "rio.mp4" },
+            { name: "Schule", pos: [12.348358, 47.85701, 5000], video: "" }
         ];
 
         let i = 0;
         function nextStop() {
             const stop = stops[i];
-            const overlay = document.getElementById('overlayImg');
+            const videoElement = document.getElementById('overlayVideo');
             const btn = document.getElementById('navButton');
             
             btn.innerText = "Reise nach: " + stop.name;
             
-            if (stop.img) {
-                overlay.src = stop.img;
-                overlay.style.display = 'block';
-                setTimeout(() => { overlay.style.opacity = '1'; }, 50);
-                setTimeout(() => { overlay.style.opacity = '0'; setTimeout(() => { overlay.style.display = 'none'; }, 1000); }, 10000);
+            if (stop.video) {
+                videoElement.querySelector('source').src = stop.video;
+                videoElement.load();
+                videoElement.style.display = 'block';
+                setTimeout(() => { videoElement.style.opacity = '1'; }, 50);
+                
+                // Ausblenden nach 15 Sekunden
+                setTimeout(() => { 
+                    videoElement.style.opacity = '0'; 
+                    setTimeout(() => { videoElement.style.display = 'none'; }, 1000); 
+                }, 15000);
+            } else {
+                videoElement.style.display = 'none';
             }
             
             viewer.camera.flyTo({
