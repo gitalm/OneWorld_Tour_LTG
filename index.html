@@ -14,12 +14,17 @@
     <img id="overlayImg" src="">
     <div id="cesiumContainer"></div>
     <script>
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4MGY4ZDRjNy0yMDUyLTQwMWYtODhjZi02MTY2MTEyNTU1YzYiLCJpZCI6NDQ1MTUxLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3ODE2MDM5MjR9.uhCaCysAWhcttaABuXOR3gLWpdt62t6qz_yaj7d6HHA';
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
 
         const viewer = new Cesium.Viewer('cesiumContainer', {
-            terrainProvider: Cesium.Terrain.fromWorldTerrain(),
+            terrainProvider: Cesium.Terrain.fromIonAssetId(1), // Dein Terrain Asset
             baseLayerPicker: false
         });
+
+        // Gebäude explizit mit deiner Asset ID 96188 laden
+        viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+            url: Cesium.IonResource.fromAssetId(96188)
+        }));
 
         const stops = [
             { name: "Dublin", pos: [-6.2603, 53.3498, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
@@ -27,7 +32,7 @@
         ];
 
         let i = 0;
-        async function nextStop() {
+        function nextStop() {
             const stop = stops[i];
             const overlay = document.getElementById('overlayImg');
             overlay.src = stop.img;
@@ -42,15 +47,7 @@
             i = (i + 1) % stops.length;
         }
 
-        async function init() {
-            try {
-                const buildings = await Cesium.createOsmBuildingsAsync();
-                viewer.scene.primitives.add(buildings);
-            } catch (e) { console.error("Gebäude-Fehler:", e); }
-        }
-        
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
-        init();
     </script>
 </body>
 </html>
