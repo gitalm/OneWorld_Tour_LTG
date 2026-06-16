@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        #cesiumContainer { width: 100%; height: 100vh; margin: 0; padding: 0; }
+        #button { position: absolute; top: 20px; left: 20px; z-index: 1; padding: 10px; }
+    </style>
+</head>
+<body>
+    <button id="button">Start: Reise nach Dublin</button>
+    <div id="cesiumContainer"></div>
+    <script>
+        // Ersetze 'DEIN_TOKEN' durch einen kostenlosen Cesium Ion Account Token
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY'; 
+
+        const viewer = new Cesium.Viewer('cesiumContainer');
+
+        // Dublin Koordinaten
+        const dublinPos = Cesium.Cartesian3.fromDegrees(-6.2603, 53.3498, 500);
+
+        // 3D Gebäude laden (Cesium World Buildings)
+        const tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+            url: Cesium.IonResource.fromAssetId(96188) // Cesium World Buildings
+        }));
+
+        document.getElementById('button').onclick = function() {
+            viewer.camera.flyTo({
+                destination: dublinPos,
+                orientation: {
+                    pitch: Cesium.Math.toRadians(-45.0),
+                    roll: 0.0
+                },
+                duration: 5 // Flugdauer in Sekunden
+            });
+        };
+    </script>
+</body>
+</html>
