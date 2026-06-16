@@ -3,60 +3,62 @@
 <head>
     <meta charset="utf-8">
     <title>One World Tour</title>
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <!-- Pfade anpassen, falls du die Dateien lokal in einem Ordner namens 'Cesium' hast -->
+    <script src="Cesium/Cesium.js"></script>
+    <link href="Cesium/Widgets/widgets.css" rel="stylesheet">
     <style>
         body, html, #cesiumContainer { width: 100%; height: 100%; margin: 0; padding: 0; }
         #overlayImg { position: absolute; bottom: 30px; right: 30px; width: 300px; display: none; border: 4px solid white; border-radius: 10px; transition: opacity 1s; opacity: 0; }
+        #status { position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.5); padding: 10px; pointer-events: none; }
     </style>
 </head>
 <body>
+    <div id="status">Drücke Leertaste für die nächste Destination</div>
     <img id="overlayImg" src="">
     <div id="cesiumContainer"></div>
-<script>
-    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
 
-    async function init() {
-        // Terrain laden
-        const terrain = await Cesium.createWorldTerrainAsync({ assetId: 1 });
-        
-        const viewer = new Cesium.Viewer('cesiumContainer', {
-            terrainProvider: terrain,
-            baseLayerPicker: false
-        });
+    <script type="module">
+        // Token setzen
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
 
-        // Gebäude laden
-        try {
-            const buildings = await Cesium.Cesium3DTileset.fromIonAssetId(96188);
+        async function init() {
+            // Viewer-Initialisierung
+            const viewer = new Cesium.Viewer('cesiumContainer', {
+                terrainProvider: await Cesium.createWorldTerrainAsync(),
+                baseLayerPicker: false
+            });
+
+            // OSM Gebäude als Asset 96188
+            const buildings = await Cesium.createOsmBuildingsAsync();
             viewer.scene.primitives.add(buildings);
-        } catch (e) { console.error("Gebäude-Fehler:", e); }
 
-        window.viewer = viewer; // Global machen für die Steuerung
-    }
+            window.viewer = viewer;
+        }
 
-    const stops = [
-        { name: "Dublin", pos: [-6.2603, 53.3498, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
-        { name: "Copacabana", pos: [-43.1770, -22.9711, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" }
-    ];
+        const stops = [
+            { name: "Dublin", pos: [-6.2603, 53.3498, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" },
+            { name: "Copacabana", pos: [-43.1770, -22.9711, 800], img: "https://media.giphy.com/media/l41lTjJp9hYyO1T1e/giphy.gif" }
+        ];
 
-    let i = 0;
-    function nextStop() {
-        const stop = stops[i];
-        const overlay = document.getElementById('overlayImg');
-        overlay.src = stop.img;
-        overlay.style.display = 'block';
-        setTimeout(() => { overlay.style.opacity = '1'; }, 50);
+        let i = 0;
+        function nextStop() {
+            const stop = stops[i];
+            const overlay = document.getElementById('overlayImg');
+            overlay.src = stop.img;
+            overlay.style.display = 'block';
+            setTimeout(() => { overlay.style.opacity = '1'; }, 50);
+            
+            window.viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(stop.pos[0], stop.pos[1], stop.pos[2]),
+                orientation: { pitch: Cesium.Math.toRadians(-45.0) },
+                duration: 5
+            });
+            i = (i + 1) % stops.length;
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
         
-        window.viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(stop.pos[0], stop.pos[1], stop.pos[2]),
-            orientation: { pitch: Cesium.Math.toRadians(-45.0) },
-            duration: 5
-        });
-        i = (i + 1) % stops.length;
-    }
-
-    document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
-    init();
-</script>
+        init();
+    </script>
 </body>
 </html>
