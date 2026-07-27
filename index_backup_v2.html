@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>One World Tour</title>
+    <script src="./Cesium/Cesium.js"></script>
+    <link href="./Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        body, html, #cesiumContainer { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        
+        #navButton { 
+            position: absolute; top: 30px; left: 30px; z-index: 9999;
+            padding: 15px 30px; font-size: 20px; font-family: sans-serif;
+            background: #2c3e50; color: white; border: 2px solid #ecf0f1;
+            border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        #overlayVideo { 
+            position: absolute; bottom: 30px; right: 30px; width: 400px; 
+            display: none; border: 4px solid white; border-radius: 10px; 
+            transition: opacity 1s; opacity: 0; z-index: 9998; 
+        }
+    </style>
+</head>
+<body>
+    <button id="navButton">Start: One World Tour</button>
+    <video id="overlayVideo" muted loop playsinline autoplay>
+        <source src="" type="video/mp4">
+    </video>
+    <div id="cesiumContainer"></div>
+
+    <script type="module">
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
+
+        let viewer;
+        async function init() {
+            viewer = new Cesium.Viewer('cesiumContainer', {
+                terrainProvider: await Cesium.createWorldTerrainAsync({ assetId: 1 }),
+                baseLayerPicker: false,
+                fullscreenButton: false,
+                animation: false,
+                timeline: false
+            });
+            viewer.scene.primitives.add(await Cesium.createOsmBuildingsAsync());
+            viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(12.348358, 47.85701, 5000) });
+        }
+
+        const stops = [
+            { name: "Dublin", pos: [-6.2603, 53.3498, 1200], video: "dublin.mp4" },
+            { name: "Rio de Janeiro", pos: [-43.2105, -22.9519, 1500], video: "rio.mp4" },
+            { name: "Schule", pos: [12.348358, 47.85701, 5000], video: "" }
+        ];
+
+        let i = 0;
+        function nextStop() {
+            const stop = stops[i];
+            const videoElement = document.getElementById('overlayVideo');
+            const btn = document.getElementById('navButton');
+            
+            btn.innerText = "Reise nach: " + stop.name;
+            
+            if (stop.video) {
+                videoElement.querySelector('source').src = stop.video;
+                videoElement.load();
+                videoElement.style.display = 'block';
+                setTimeout(() => { videoElement.style.opacity = '1'; }, 50);
+                
+                // Ausblenden nach 15 Sekunden
+                setTimeout(() => { 
+                    videoElement.style.opacity = '0'; 
+                    setTimeout(() => { videoElement.style.display = 'none'; }, 1000); 
+                }, 15000);
+            } else {
+                videoElement.style.display = 'none';
+            }
+            
+            viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(stop.pos[0], stop.pos[1], stop.pos[2]),
+                orientation: { pitch: Cesium.Math.toRadians(-30.0), roll: 0.0 },
+                duration: 12
+            });
+            i = (i + 1) % stops.length;
+        }
+
+        document.getElementById('navButton').addEventListener('click', nextStop);
+        document.addEventListener('keydown', (e) => { if (e.code === 'Space') nextStop(); });
+        
+        init();
+    </script>
+</body>
+</html>
