@@ -131,12 +131,12 @@
         /* ============ SLIDESHOW OVERLAY ============ */
         #slideshowOverlay {
             position: absolute;
-            bottom: -400px;
+            bottom: -450px;
             left: 50%;
             transform: translateX(-50%);
-            width: 600px;
-            max-width: 90vw;
-            background: rgba(0, 0, 0, 0.85);
+            width: 650px;
+            max-width: 92vw;
+            background: rgba(0, 0, 0, 0.88);
             border-radius: 16px;
             z-index: 1002;
             backdrop-filter: blur(12px);
@@ -152,45 +152,56 @@
             text-align: center;
             color: #FFD700;
             font-family: 'Segoe UI', sans-serif;
-            font-size: 1em;
-            padding: 12px 20px 4px 20px;
-            font-weight: 500;
+            font-size: 1.05em;
+            padding: 14px 20px 6px 20px;
+            font-weight: 600;
             letter-spacing: 1px;
         }
         #slideshowOverlay .slideshow-images {
             display: flex;
-            gap: 10px;
-            padding: 10px 20px 16px 20px;
+            gap: 12px;
+            padding: 8px 20px 18px 20px;
             justify-content: center;
             flex-wrap: wrap;
+            align-items: center;
         }
         #slideshowOverlay .slideshow-images img,
         #slideshowOverlay .slideshow-images video {
-            width: 170px;
-            height: 110px;
+            width: 185px;
+            height: 120px;
             object-fit: cover;
             border-radius: 10px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             transition: all 0.3s;
             background: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        #slideshowOverlay .slideshow-images img:hover,
+        #slideshowOverlay .slideshow-images video:hover {
+            border-color: #FFD700;
+            transform: scale(1.04);
         }
         #slideshowOverlay .slideshow-images video {
             background: #000;
         }
         #slideshowClose {
             position: absolute;
-            top: 8px;
-            right: 14px;
+            top: 10px;
+            right: 16px;
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 22px;
             cursor: pointer;
             z-index: 1003;
             pointer-events: auto;
+            transition: color 0.2s;
         }
         #slideshowClose:hover {
             color: white;
+        }
+        #slideshowOverlay .slideshow-images img.broken {
+            display: none;
         }
 
         /* Responsive */
@@ -200,8 +211,8 @@
             }
             #slideshowOverlay .slideshow-images img,
             #slideshowOverlay .slideshow-images video {
-                width: 130px;
-                height: 85px;
+                width: 135px;
+                height: 90px;
             }
         }
     </style>
@@ -271,7 +282,29 @@
             viewer.cesiumWidget.creditContainer.style.display = 'none';
 
             // ========================================
-            // DESTINATIONS (mit Medien für die Slideshow)
+            // BILDER-ORDNER: Hier den Pfad zu deinen
+            // lokalen Bildern angeben!
+            // ========================================
+            // Lege einen Ordner "images" neben der index.html an und
+            // benenne die Bilder z.B. so:
+            //   images/afrika1.jpg, afrika2.jpg, afrika3.jpg
+            //   images/norwegen1.jpg, norwegen2.jpg, norwegen3.jpg
+            //   ... usw.
+            //
+            // Alternativ: Nutze die Unsplash-URLs unten (funktionieren garantiert).
+            
+            const IMAGE_BASE = 'images/'; // ← für lokale Bilder: Ordnerpfad anpassen
+
+            // Hilfsfunktion: Lokale Bilder ODER Fallback-URLs (Unsplash – hotlink-fähig)
+            function img(localFile, unsplashId) {
+                // Wenn lokale Bilder vorhanden sind: 'images/afrika1.jpg'
+                // Ansonsten wird die Unsplash-URL als Fallback verwendet
+                // return IMAGE_BASE + localFile;
+                return 'https://images.unsplash.com/' + unsplashId + '?w=400&h=260&fit=crop';
+            }
+
+            // ========================================
+            // DESTINATIONS mit zuverlässigen Bild-URLs
             // ========================================
             const destinations = [
                 {
@@ -286,9 +319,9 @@
                     duration: 8,
                     slideshowTitle: '🇹🇿 Tansania – Am Fuße des Kilimandscharo',
                     media: [
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Mount_Kilimanjaro.jpg/320px-Mount_Kilimanjaro.jpg', alt: 'Kilimandscharo' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Zebras_Serengeti.JPG/320px-Zebras_Serengeti.JPG', alt: 'Serengeti' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Maasai_women_and_children.jpg/320px-Maasai_women_and_children.jpg', alt: 'Massai' }
+                        { type: 'image', src: img('afrika1.jpg', 'photo-1489392191049-fc10c97e64b6'), alt: 'Kilimandscharo' },
+                        { type: 'image', src: img('afrika2.jpg', 'photo-1516426122078-c23e76319801'), alt: 'Serengeti' },
+                        { type: 'image', src: img('afrika3.jpg', 'photo-1547471080-7cc2caa01a7e'), alt: 'Afrikanische Landschaft' }
                     ]
                 },
                 {
@@ -303,9 +336,9 @@
                     duration: 8,
                     slideshowTitle: '🇳🇴 Norwegen – Land der Fjorde',
                     media: [
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Geirangerfjord_%286-2007%29.jpg/320px-Geirangerfjord_%286-2007%29.jpg', alt: 'Geirangerfjord' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Trolltunga.jpg/320px-Trolltunga.jpg', alt: 'Trolltunga' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Edvard_Grieg_%281888%29_by_Elliot_%26_Fry.jpg/320px-Edvard_Grieg_%281888%29_by_Elliot_%26_Fry.jpg', alt: 'Edvard Grieg' }
+                        { type: 'image', src: img('norwegen1.jpg', 'photo-1507003211169-0a1dd7228f2d'), alt: 'Fjorde' },
+                        { type: 'image', src: img('norwegen2.jpg', 'photo-1531366936337-7c912a4589a7'), alt: 'Norwegische Berge' },
+                        { type: 'image', src: img('norwegen3.jpg', 'photo-1520769669658-f07657f5a307'), alt: 'Nordlichter' }
                     ]
                 },
                 {
@@ -320,9 +353,9 @@
                     duration: 7,
                     slideshowTitle: '🇭🇺 Ungarn – Puszta & Budapest',
                     media: [
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Budapest_Parliament_4604.jpg/320px-Budapest_Parliament_4604.jpg', alt: 'Parlament Budapest' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Hortob%C3%A1gy-%C3%B6szt%C3%B6n_1.jpg/320px-Hortob%C3%A1gy-%C3%B6szt%C3%B6n_1.jpg', alt: 'Puszta' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Johannes_Brahms_1853.jpg/320px-Johannes_Brahms_1853.jpg', alt: 'Johannes Brahms' }
+                        { type: 'image', src: img('ungarn1.jpg', 'photo-1561212044-37710e0e55a0'), alt: 'Parlament Budapest' },
+                        { type: 'image', src: img('ungarn2.jpg', 'photo-1558618666-fcd25c85f82e'), alt: 'Puszta' },
+                        { type: 'image', src: img('ungarn3.jpg', 'photo-1519999482648-25049ddd37b1'), alt: 'Donau' }
                     ]
                 },
                 {
@@ -337,9 +370,9 @@
                     duration: 8,
                     slideshowTitle: '🇧🇷 Brasilien – Karneval & Samba',
                     media: [
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Cidade_Maravilhosa.jpg/320px-Cidade_Maravilhosa.jpg', alt: 'Rio de Janeiro' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Carnaval_Rio_2012.jpg/320px-Carnaval_Rio_2012.jpg', alt: 'Karneval Rio' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Amazonas-Fluss.jpg/320px-Amazonas-Fluss.jpg', alt: 'Amazonas' }
+                        { type: 'image', src: img('brasilien1.jpg', 'photo-1483729558449-99ef09a8c325'), alt: 'Rio de Janeiro' },
+                        { type: 'image', src: img('brasilien2.jpg', 'photo-1516306580123-e6e52b7b7b9f'), alt: 'Karneval' },
+                        { type: 'image', src: img('brasilien3.jpg', 'photo-1518531933037-91b2f5f229cc'), alt: 'Amazonas' }
                     ]
                 },
                 {
@@ -354,9 +387,9 @@
                     duration: 7,
                     slideshowTitle: '🇮🇪 Irland – Die grüne Insel',
                     media: [
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Cliffs_of_Moher_%28South%29.jpg/320px-Cliffs_of_Moher_%28South%29.jpg', alt: 'Cliffs of Moher' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Concertina.jpg/320px-Concertina.jpg', alt: 'Concertina' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Irish_dancers_at_the_St._Patrick%27s_Day_parade_in_Dublin.jpg/320px-Irish_dancers_at_the_St._Patrick%27s_Day_parade_in_Dublin.jpg', alt: 'Irish Dance' }
+                        { type: 'image', src: img('irland1.jpg', 'photo-1590089415225-4011816f9db8'), alt: 'Cliffs of Moher' },
+                        { type: 'image', src: img('irland2.jpg', 'photo-1559827291-baf8ef90a28a'), alt: 'Grüne Hügel' },
+                        { type: 'image', src: img('irland3.jpg', 'photo-1564507592333-c60657eea523'), alt: 'Irland Küste' }
                     ]
                 },
                 {
@@ -371,9 +404,9 @@
                     duration: 8,
                     slideshowTitle: '🇨🇳 China – Reich der Mitte',
                     media: [
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/The_Great_Wall_of_China_at_Jinshanling.jpg/320px-The_Great_Wall_of_China_at_Jinshanling.jpg', alt: 'Chinesische Mauer' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Jasminum_polyanthum.jpg/320px-Jasminum_polyanthum.jpg', alt: 'Jasminblüte' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Shanghai_Skyline%2C_Dec2014.jpg/320px-Shanghai_Skyline%2C_Dec2014.jpg', alt: 'Shanghai' }
+                        { type: 'image', src: img('china1.jpg', 'photo-1508804185872-d7badad00f7d'), alt: 'Chinesische Mauer' },
+                        { type: 'image', src: img('china2.jpg', 'photo-1547981609-4b6bfe67ca0b'), alt: 'Jasminblüte' },
+                        { type: 'image', src: img('china3.jpg', 'photo-1537531383496-f4749b88b357'), alt: 'China Landschaft' }
                     ]
                 },
                 {
@@ -388,9 +421,9 @@
                     duration: 9,
                     slideshowTitle: '🇿🇦 Südafrika – Regenbogennation',
                     media: [
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Table_Mountain_DanieVDM.jpg/320px-Table_Mountain_DanieVDM.jpg', alt: 'Tafelberg' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/South_African_choir.jpg/320px-South_African_choir.jpg', alt: 'Südafrikanischer Chor' },
-                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Kruger_National_Park_%282848258721%29.jpg/320px-Kruger_National_Park_%282848258721%29.jpg', alt: 'Krüger Nationalpark' }
+                        { type: 'image', src: img('suedafrika1.jpg', 'photo-1580060839134-75a5edca2e99'), alt: 'Tafelberg' },
+                        { type: 'image', src: img('suedafrika2.jpg', 'photo-1576485290814-1c72aa4bbb8e'), alt: 'Kapstadt' },
+                        { type: 'image', src: img('suedafrika3.jpg', 'photo-1516026672322-bc52d61a55d5'), alt: 'Safari' }
                     ]
                 }
             ];
@@ -401,7 +434,6 @@
             let slideshowTimeout = null;
             let animationInProgress = false;
 
-            // UI Elements
             const stationNameEl = document.getElementById('stationName');
             const progressFill = document.getElementById('progressFill');
             const btnPlay = document.getElementById('btnPlay');
@@ -421,7 +453,6 @@
                 });
             }
 
-            // Slideshow-Funktionen
             function showSlideshow(dest) {
                 if (!dest.media || dest.media.length === 0) return;
 
@@ -435,8 +466,9 @@
                         img.alt = item.alt || '';
                         img.title = item.alt || '';
                         img.loading = 'lazy';
+                        // Fallback: bei Lade-Fehler ausblenden
                         img.onerror = function() {
-                            this.style.display = 'none';
+                            this.classList.add('broken');
                         };
                         slideshowImages.appendChild(img);
                     } else if (item.type === 'video') {
@@ -448,7 +480,7 @@
                         video.playsInline = true;
                         video.title = item.alt || '';
                         video.onerror = function() {
-                            this.style.display = 'none';
+                            this.classList.add('broken');
                         };
                         slideshowImages.appendChild(video);
                         video.play().catch(() => {});
@@ -484,7 +516,6 @@
                 }
             }
 
-            // Fly to destination
             function flyToDestination(index) {
                 if (index < 0 || index >= destinations.length) return;
 
@@ -511,7 +542,6 @@
                         animationInProgress = false;
                         lockCameraNorthDown(dest);
 
-                        // Nach 1 Sekunde Slideshow einblenden
                         slideshowTimeout = setTimeout(() => {
                             showSlideshow(dest);
                         }, 1000);
@@ -549,7 +579,6 @@
                 }
             }
 
-            // Auto-Play
             const originalFlyTo = flyToDestination;
             flyToDestination = function(index) {
                 cancelScheduledFlight();
@@ -559,15 +588,12 @@
 
                 const dest = destinations[index];
                 if (isAutoPlaying && index < destinations.length - 1) {
-                    // Slideshow bleibt ~6 Sekunden sichtbar, dann Weiterflug
-                    const slideShowDuration = 6000;
                     flightTimeout = setTimeout(() => {
                         if (isAutoPlaying) nextStation();
-                    }, (dest.duration * 1000) + slideShowDuration);
+                    }, (dest.duration * 1000) + 6000);
                 }
             };
 
-            // Button-Events
             document.getElementById('btnNext').addEventListener('click', () => {
                 isAutoPlaying = false;
                 btnPlay.classList.remove('active');
@@ -591,7 +617,6 @@
                 }
             });
 
-            // Tastatur
             document.addEventListener('keydown', (e) => {
                 switch(e.key) {
                     case 'ArrowRight':
@@ -621,13 +646,11 @@
                 }
             });
 
-            // Start
             setTimeout(() => {
                 flyToDestination(0);
             }, 1500);
 
             console.log('🌍 One World Tour bereit!');
-            console.log('Stationen:', destinations.map(d => d.name).join(' → '));
         })();
     </script>
 </body>
