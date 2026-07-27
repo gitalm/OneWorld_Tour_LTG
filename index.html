@@ -13,6 +13,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+            background: #000;
         }
         #infoPanel {
             position: absolute;
@@ -153,353 +154,303 @@
     </div>
 
     <script>
-        // Cesium Ion Token (kostenlos unter https://ion.cesium.com/ registrieren)
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
+        (async function initCesium() {
+            // Cesium Ion Token (ersetzen mit deinem eigenen Token)
+            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
 
-// Initialize Cesium Viewer
-const viewer = new Cesium.Viewer('cesiumContainer', {
-    animation: false,
-    timeline: false,
-    baseLayerPicker: false,
-    fullscreenButton: false,
-    homeButton: false,
-    sceneModePicker: false,
-    navigationHelpButton: false,
-    geocoder: false,
-    selectionIndicator: false,
-    infoBox: false
-});
-
-// Einfachen Karten-Layer ohne zusätzliche Assets verwenden
-viewer.imageryLayers.removeAll();
-viewer.imageryLayers.addImageryProvider(
-    new Cesium.OpenStreetMapImageryProvider({
-        url: 'https://tile.openstreetmap.org/',
-        maximumLevel: 18
-    })
-);
-
-// Enable atmosphere
-viewer.scene.skyAtmosphere.show = true;
-viewer.scene.globe.enableLighting = true;
-viewer.scene.globe.showGroundAtmosphere = true;
-
-
-        // Flight destinations with coordinates and viewing angles
-        // Each destination: { name, lat, lon, altitude (meters), heading (degrees), pitch (negative = looking down), roll, duration (seconds) }
-        const destinations = [
-            {
-                name: 'Afrika – Kilimandscharo Region',
-                subtitle: 'Africa (Toto)',
-                lat: -3.07,
-                lon: 37.35,
-                altitude: 800000,
-                heading: 45,
-                pitch: -50,
-                roll: 0,
-                duration: 8,
-                description: 'Tansania / Kenia – Region des Kilimandscharo'
-            },
-            {
-                name: 'Norwegen – Fjorde',
-                subtitle: 'Peer Gynt Suite (Grieg)',
-                lat: 62.0,
-                lon: 7.0,
-                altitude: 600000,
-                heading: 180,
-                pitch: -55,
-                roll: 0,
-                duration: 8,
-                description: 'Norwegische Fjordlandschaft'
-            },
-            {
-                name: 'Ungarn – Puszta',
-                subtitle: 'Ungarischer Tanz Nr. 5 (Brahms)',
-                lat: 47.0,
-                lon: 19.5,
-                altitude: 500000,
-                heading: 90,
-                pitch: -50,
-                roll: 0,
-                duration: 7,
-                description: 'Budapest und die ungarische Tiefebene'
-            },
-            {
-                name: 'Südamerika – Brasilien',
-                subtitle: 'Sunday in Rio / La Cucaracha',
-                lat: -10.0,
-                lon: -50.0,
-                altitude: 2500000,
-                heading: 270,
-                pitch: -55,
-                roll: 0,
-                duration: 8,
-                description: 'Brasilien – von Rio bis zum Amazonas'
-            },
-            {
-                name: 'Irland – Grüne Insel',
-                subtitle: 'Irish Suite (Anderson)',
-                lat: 53.3,
-                lon: -8.0,
-                altitude: 500000,
-                heading: 0,
-                pitch: -50,
-                roll: 0,
-                duration: 7,
-                description: 'Die gesamte grüne Insel im Blick'
-            },
-            {
-                name: 'China – Jasminblüte',
-                subtitle: 'Mo Li Hua',
-                lat: 32.0,
-                lon: 108.0,
-                altitude: 1800000,
-                heading: 135,
-                pitch: -55,
-                roll: 0,
-                duration: 8,
-                description: 'China – Reich der Mitte'
-            },
-            {
-                name: 'Afrika – Rückkehr',
-                subtitle: 'Baba Yetu',
-                lat: 0.0,
-                lon: 25.0,
-                altitude: 3000000,
-                heading: 0,
-                pitch: -60,
-                roll: 0,
-                duration: 9,
-                description: 'Der ganze afrikanische Kontinent'
-            }
-        ];
-
-        let currentStation = 0;
-        let isAutoPlaying = true;
-        let flightTimeout = null;
-        let animationInProgress = false;
-
-        // UI Elements
-        const stationNameEl = document.getElementById('stationName');
-        const progressFill = document.getElementById('progressFill');
-        const btnPlay = document.getElementById('btnPlay');
-        const stationItems = document.querySelectorAll('#stationList .station');
-
-        function updateUI() {
-            stationNameEl.textContent = `${destinations[currentStation].name} – ${destinations[currentStation].subtitle}`;
-            progressFill.style.width = `${((currentStation) / (destinations.length - 1)) * 100}%`;
-
-            stationItems.forEach((item, index) => {
-                item.classList.remove('current', 'done');
-                if (index === currentStation) item.classList.add('current');
-                if (index < currentStation) item.classList.add('done');
+            // Initialize Cesium Viewer
+            const viewer = new Cesium.Viewer('cesiumContainer', {
+                animation: false,
+                timeline: false,
+                baseLayerPicker: false,
+                fullscreenButton: false,
+                homeButton: false,
+                sceneModePicker: false,
+                navigationHelpButton: false,
+                geocoder: false,
+                selectionIndicator: false,
+                infoBox: false
             });
-        }
 
-        // Fly to a destination with camera always looking at Earth
-        function flyToDestination(index) {
-            if (index < 0 || index >= destinations.length) return;
-            
-            currentStation = index;
-            animationInProgress = true;
-            updateUI();
+            // Sentinel-2 Satellitenbilder
+            viewer.imageryLayers.removeAll();
+            viewer.imageryLayers.addImageryProvider(
+                await Cesium.IonImageryProvider.fromAssetId(3954)
+            );
 
-            const dest = destinations[currentStation];
-            
-            // Calculate camera position so it always looks toward Earth center
-            // Using Cesium's flyTo with a heading/pitch/range approach
-            viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(
-                    dest.lon,
-                    dest.lat,
-                    dest.altitude
-                ),
-                orientation: {
-                    heading: Cesium.Math.toRadians(dest.heading),
-                    pitch: Cesium.Math.toRadians(dest.pitch), // Negative = looking down at Earth
-                    roll: Cesium.Math.toRadians(dest.roll || 0)
+            // Atmosphere & Beleuchtung
+            viewer.scene.skyAtmosphere.show = true;
+            viewer.scene.globe.enableLighting = true;
+            viewer.scene.globe.showGroundAtmosphere = true;
+
+            // Credits ausblenden
+            viewer.cesiumWidget.creditContainer.style.display = 'none';
+
+            // ========================================
+            // DESTINATIONS (Norden ist immer oben!)
+            // heading: 0 = Norden oben, pitch: negativ = Blick zur Erde
+            // ========================================
+            const destinations = [
+                {
+                    name: 'Afrika – Kilimandscharo Region',
+                    subtitle: 'Africa (Toto)',
+                    lat: -3.07,
+                    lon: 37.35,
+                    altitude: 800000,
+                    heading: 0,
+                    pitch: -50,
+                    roll: 0,
+                    duration: 8,
+                    description: 'Tansania / Kenia – Region des Kilimandscharo'
                 },
-                duration: dest.duration,
-                easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT,
-                complete: function() {
-                    animationInProgress = false;
-                    // Small gentle rotation after arrival for a nice effect
-                    startGentleOrbit(dest);
+                {
+                    name: 'Norwegen – Fjorde',
+                    subtitle: 'Peer Gynt Suite (Grieg)',
+                    lat: 62.5,
+                    lon: 7.5,
+                    altitude: 700000,
+                    heading: 0,
+                    pitch: -55,
+                    roll: 0,
+                    duration: 8,
+                    description: 'Norwegische Fjordlandschaft'
+                },
+                {
+                    name: 'Ungarn – Puszta',
+                    subtitle: 'Ungarischer Tanz Nr. 5 (Brahms)',
+                    lat: 47.2,
+                    lon: 19.0,
+                    altitude: 550000,
+                    heading: 0,
+                    pitch: -50,
+                    roll: 0,
+                    duration: 7,
+                    description: 'Budapest und die ungarische Tiefebene'
+                },
+                {
+                    name: 'Südamerika – Brasilien',
+                    subtitle: 'Sunday in Rio / La Cucaracha',
+                    lat: -12.0,
+                    lon: -52.0,
+                    altitude: 2500000,
+                    heading: 0,
+                    pitch: -55,
+                    roll: 0,
+                    duration: 8,
+                    description: 'Brasilien – von Rio bis zum Amazonas'
+                },
+                {
+                    name: 'Irland – Grüne Insel',
+                    subtitle: 'Irish Suite (Anderson)',
+                    lat: 53.0,
+                    lon: -8.0,
+                    altitude: 650000,
+                    heading: 0,
+                    pitch: -55,
+                    roll: 0,
+                    duration: 7,
+                    description: 'Die gesamte grüne Insel im Blick'
+                },
+                {
+                    name: 'China – Jasminblüte',
+                    subtitle: 'Mo Li Hua',
+                    lat: 33.0,
+                    lon: 105.0,
+                    altitude: 2200000,
+                    heading: 0,
+                    pitch: -55,
+                    roll: 0,
+                    duration: 8,
+                    description: 'China – Reich der Mitte'
+                },
+                {
+                    name: 'Afrika – Rückkehr',
+                    subtitle: 'Baba Yetu',
+                    lat: 2.0,
+                    lon: 22.0,
+                    altitude: 3500000,
+                    heading: 0,
+                    pitch: -60,
+                    roll: 0,
+                    duration: 9,
+                    description: 'Der ganze afrikanische Kontinent'
                 }
-            });
-        }
+            ];
 
-        let orbitAnimation = null;
+            let currentStation = 0;
+            let isAutoPlaying = true;
+            let flightTimeout = null;
+            let animationInProgress = false;
 
-        function startGentleOrbit(dest) {
-            // Cancel any previous gentle orbit
-            if (orbitAnimation) {
-                viewer.scene.postRender.removeEventListener(orbitAnimation);
-                orbitAnimation = null;
+            // UI Elements
+            const stationNameEl = document.getElementById('stationName');
+            const progressFill = document.getElementById('progressFill');
+            const btnPlay = document.getElementById('btnPlay');
+            const stationItems = document.querySelectorAll('#stationList .station');
+
+            function updateUI() {
+                stationNameEl.textContent = `${destinations[currentStation].name} – ${destinations[currentStation].subtitle}`;
+                progressFill.style.width = `${((currentStation) / (destinations.length - 1)) * 100}%`;
+
+                stationItems.forEach((item, index) => {
+                    item.classList.remove('current', 'done');
+                    if (index === currentStation) item.classList.add('current');
+                    if (index < currentStation) item.classList.add('done');
+                });
             }
 
-            let startTime = null;
-            const orbitDuration = 6; // seconds for gentle pan
-            const totalOrbitDegrees = 15; // gentle rotation degrees
+            let orbitAnimation = null;
 
-            orbitAnimation = function(scene, time) {
-                if (!startTime) startTime = time;
-                const elapsed = Cesium.JulianDate.secondsDifference(time, startTime);
-                
-                if (elapsed < orbitDuration) {
-                    const progress = elapsed / orbitDuration;
-                    const easeProgress = 0.5 - 0.5 * Math.cos(Math.PI * progress); // smooth ease
-                    const extraHeading = totalOrbitDegrees * easeProgress;
-                    
-                    const camera = viewer.camera;
-                    const currentHeading = dest.heading + extraHeading;
-                    
-                    camera.setView({
-                        destination: Cesium.Cartesian3.fromDegrees(dest.lon, dest.lat, dest.altitude),
-                        orientation: {
-                            heading: Cesium.Math.toRadians(currentHeading),
-                            pitch: Cesium.Math.toRadians(dest.pitch),
-                            roll: Cesium.Math.toRadians(dest.roll || 0)
-                        }
-                    });
-                } else {
-                    if (orbitAnimation) {
-                        viewer.scene.postRender.removeEventListener(orbitAnimation);
-                        orbitAnimation = null;
+            function cancelOrbit() {
+                if (orbitAnimation) {
+                    viewer.scene.postRender.removeEventListener(orbitAnimation);
+                    orbitAnimation = null;
+                }
+            }
+
+            function cancelScheduledFlight() {
+                if (flightTimeout) {
+                    clearTimeout(flightTimeout);
+                    flightTimeout = null;
+                }
+            }
+
+            // Fly to destination – Norden immer oben (heading = 0), Kamera blickt zur Erde
+            function flyToDestination(index) {
+                if (index < 0 || index >= destinations.length) return;
+
+                cancelScheduledFlight();
+                cancelOrbit();
+
+                currentStation = index;
+                animationInProgress = true;
+                updateUI();
+
+                const dest = destinations[currentStation];
+
+                viewer.camera.flyTo({
+                    destination: Cesium.Cartesian3.fromDegrees(dest.lon, dest.lat, dest.altitude),
+                    orientation: {
+                        heading: Cesium.Math.toRadians(dest.heading),  // 0 = Norden oben
+                        pitch: Cesium.Math.toRadians(dest.pitch),      // negativ = Blick zur Erde
+                        roll: Cesium.Math.toRadians(dest.roll || 0)
+                    },
+                    duration: dest.duration,
+                    easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT,
+                    complete: function() {
+                        animationInProgress = false;
+                        // Nach Ankunft: Kamera festhalten – Norden bleibt oben!
+                        lockCameraNorthDown(dest);
                     }
+                });
+            }
+
+            // Kamera fixieren: Norden oben, Blick zur Erde (kein sanftes Drehen mehr)
+            function lockCameraNorthDown(dest) {
+                cancelOrbit();
+
+                // Kamera einmalig korrekt setzen
+                viewer.camera.setView({
+                    destination: Cesium.Cartesian3.fromDegrees(dest.lon, dest.lat, dest.altitude),
+                    orientation: {
+                        heading: Cesium.Math.toRadians(0),
+                        pitch: Cesium.Math.toRadians(dest.pitch),
+                        roll: Cesium.Math.toRadians(0)
+                    }
+                });
+            }
+
+            function nextStation() {
+                if (animationInProgress) return;
+                cancelScheduledFlight();
+                if (currentStation < destinations.length - 1) {
+                    flyToDestination(currentStation + 1);
+                }
+            }
+
+            function prevStation() {
+                if (animationInProgress) return;
+                cancelScheduledFlight();
+                if (currentStation > 0) {
+                    flyToDestination(currentStation - 1);
+                }
+            }
+
+            // Auto-Play: Nach jeder Station automatisch weiter
+            const originalFlyTo = flyToDestination;
+            flyToDestination = function(index) {
+                cancelScheduledFlight();
+                cancelOrbit();
+                originalFlyTo(index);
+
+                const dest = destinations[index];
+                if (isAutoPlaying && index < destinations.length - 1) {
+                    flightTimeout = setTimeout(() => {
+                        if (isAutoPlaying) nextStation();
+                    }, (dest.duration + 5) * 1000);
                 }
             };
 
-            viewer.scene.postRender.addEventListener(orbitAnimation);
-        }
-
-        function nextStation() {
-            if (animationInProgress) return;
-            cancelScheduledFlight();
-            if (currentStation < destinations.length - 1) {
-                flyToDestination(currentStation + 1);
-            }
-        }
-
-        function prevStation() {
-            if (animationInProgress) return;
-            cancelScheduledFlight();
-            if (currentStation > 0) {
-                flyToDestination(currentStation - 1);
-            }
-        }
-
-        function cancelScheduledFlight() {
-            if (flightTimeout) {
-                clearTimeout(flightTimeout);
-                flightTimeout = null;
-            }
-        }
-
-        function startAutoPlay() {
-            if (currentStation >= destinations.length - 1) {
-                currentStation = 0;
-                flyToDestination(0);
-                return;
-            }
-            flyToDestination(currentStation);
-        }
-
-        function scheduleNextFlight() {
-            if (!isAutoPlaying) return;
-            if (currentStation < destinations.length - 1) {
-                const dest = destinations[currentStation];
-                flightTimeout = setTimeout(() => {
-                    nextStation();
-                }, (dest.duration + 6) * 1000); // flight duration + gentle orbit time
-            }
-        }
-
-        // Override flyToDestination to auto-schedule next flight
-        const originalFlyTo = flyToDestination;
-        flyToDestination = function(index) {
-            cancelScheduledFlight();
-            if (orbitAnimation) {
-                viewer.scene.postRender.removeEventListener(orbitAnimation);
-                orbitAnimation = null;
-            }
-            originalFlyTo(index);
-
-            // After the flight completes (duration + some buffer), schedule next
-            const dest = destinations[index];
-            const totalTime = (dest.duration + 6) * 1000;
-            if (isAutoPlaying && index < destinations.length - 1) {
-                flightTimeout = setTimeout(() => {
-                    if (isAutoPlaying) {
-                        nextStation();
-                    }
-                }, totalTime);
-            }
-        };
-
-        // Button event handlers
-        document.getElementById('btnNext').addEventListener('click', () => {
-            isAutoPlaying = false;
-            btnPlay.classList.remove('active');
-            nextStation();
-        });
-
-        document.getElementById('btnPrev').addEventListener('click', () => {
-            isAutoPlaying = false;
-            btnPlay.classList.remove('active');
-            prevStation();
-        });
-
-        btnPlay.addEventListener('click', () => {
-            isAutoPlaying = !isAutoPlaying;
-            if (isAutoPlaying) {
-                btnPlay.classList.add('active');
-                // Continue from current station
-                flyToDestination(currentStation);
-            } else {
+            // Button-Events
+            document.getElementById('btnNext').addEventListener('click', () => {
+                isAutoPlaying = false;
                 btnPlay.classList.remove('active');
-                cancelScheduledFlight();
-            }
-        });
+                nextStation();
+            });
 
-        // Keyboard controls
-        document.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case 'ArrowRight':
-                    isAutoPlaying = false;
+            document.getElementById('btnPrev').addEventListener('click', () => {
+                isAutoPlaying = false;
+                btnPlay.classList.remove('active');
+                prevStation();
+            });
+
+            btnPlay.addEventListener('click', () => {
+                isAutoPlaying = !isAutoPlaying;
+                if (isAutoPlaying) {
+                    btnPlay.classList.add('active');
+                    flyToDestination(currentStation);
+                } else {
                     btnPlay.classList.remove('active');
-                    nextStation();
-                    break;
-                case 'ArrowLeft':
-                    isAutoPlaying = false;
-                    btnPlay.classList.remove('active');
-                    prevStation();
-                    break;
-                case ' ':
-                    e.preventDefault();
-                    isAutoPlaying = !isAutoPlaying;
-                    if (isAutoPlaying) {
-                        btnPlay.classList.add('active');
-                        flyToDestination(currentStation);
-                    } else {
+                    cancelScheduledFlight();
+                }
+            });
+
+            // Tastatur
+            document.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case 'ArrowRight':
+                        isAutoPlaying = false;
                         btnPlay.classList.remove('active');
-                        cancelScheduledFlight();
-                    }
-                    break;
-            }
-        });
+                        nextStation();
+                        break;
+                    case 'ArrowLeft':
+                        isAutoPlaying = false;
+                        btnPlay.classList.remove('active');
+                        prevStation();
+                        break;
+                    case ' ':
+                        e.preventDefault();
+                        isAutoPlaying = !isAutoPlaying;
+                        if (isAutoPlaying) {
+                            btnPlay.classList.add('active');
+                            flyToDestination(currentStation);
+                        } else {
+                            btnPlay.classList.remove('active');
+                            cancelScheduledFlight();
+                        }
+                        break;
+                }
+            });
 
-        // Initial flight
-        setTimeout(() => {
-            flyToDestination(0);
-        }, 1500);
+            // Start
+            setTimeout(() => {
+                flyToDestination(0);
+            }, 1500);
 
-        // Hide Cesium logo watermark (optional)
-        viewer.cesiumWidget.creditContainer.style.display = 'none';
-
-        console.log('🌍 One World Tour bereit!');
-        console.log('Stationen:', destinations.map(d => d.name).join(' → '));
-        console.log('Steuerung: Pfeiltasten ← → | Leertaste = Play/Pause | Buttons unten rechts');
+            console.log('🌍 One World Tour bereit!');
+            console.log('Stationen:', destinations.map(d => d.name).join(' → '));
+            console.log('Norden ist immer oben | Kamera blickt stets zur Erde');
+        })();
     </script>
 </body>
 </html>
