@@ -142,7 +142,7 @@
         <div class="station" data-station="3">4. Südamerika – Sunday in Rio</div>
         <div class="station" data-station="4">5. Irland – Irish Suite</div>
         <div class="station" data-station="5">6. China – Mo Li Hua</div>
-        <div class="station" data-station="6">7. Afrika – Baba Yetu</div>
+        <div class="station" data-station="6">7. Südafrika – Baba Yetu</div>
     </div>
     <div id="progressBar">
         <div id="progressFill"></div>
@@ -188,10 +188,10 @@
 
             // ========================================
             // DESTINATIONS (Norden ist immer oben!)
-            // heading: 0 = Norden oben, pitch: negativ = Blick zur Erde
             // ========================================
             const destinations = [
                 {
+                    // 1. Afrika – Kilimandscharo Region (Tansania/Kenia)
                     name: 'Afrika – Kilimandscharo Region',
                     subtitle: 'Africa (Toto)',
                     lat: -3.07,
@@ -200,22 +200,22 @@
                     heading: 0,
                     pitch: -50,
                     roll: 0,
-                    duration: 8,
-                    description: 'Tansania / Kenia – Region des Kilimandscharo'
+                    duration: 8
                 },
                 {
-                    name: 'Norwegen – Fjorde',
+                    // 2. Norwegen – Fjorde & Berge (weiter östlich, weg von der Nordsee)
+                    name: 'Norwegen – Fjorde & Berge',
                     subtitle: 'Peer Gynt Suite (Grieg)',
-                    lat: 62.5,
-                    lon: 7.5,
-                    altitude: 700000,
+                    lat: 62.0,
+                    lon: 9.0,
+                    altitude: 650000,
                     heading: 0,
                     pitch: -55,
                     roll: 0,
-                    duration: 8,
-                    description: 'Norwegische Fjordlandschaft'
+                    duration: 8
                 },
                 {
+                    // 3. Ungarn – Puszta
                     name: 'Ungarn – Puszta',
                     subtitle: 'Ungarischer Tanz Nr. 5 (Brahms)',
                     lat: 47.2,
@@ -224,22 +224,22 @@
                     heading: 0,
                     pitch: -50,
                     roll: 0,
-                    duration: 7,
-                    description: 'Budapest und die ungarische Tiefebene'
+                    duration: 7
                 },
                 {
+                    // 4. Südamerika – Brasilien (Richtung Rio de Janeiro)
                     name: 'Südamerika – Brasilien',
                     subtitle: 'Sunday in Rio / La Cucaracha',
-                    lat: -12.0,
-                    lon: -52.0,
-                    altitude: 2500000,
+                    lat: -18.0,
+                    lon: -45.0,
+                    altitude: 2800000,
                     heading: 0,
                     pitch: -55,
                     roll: 0,
-                    duration: 8,
-                    description: 'Brasilien – von Rio bis zum Amazonas'
+                    duration: 8
                 },
                 {
+                    // 5. Irland – Grüne Insel
                     name: 'Irland – Grüne Insel',
                     subtitle: 'Irish Suite (Anderson)',
                     lat: 53.0,
@@ -248,10 +248,10 @@
                     heading: 0,
                     pitch: -55,
                     roll: 0,
-                    duration: 7,
-                    description: 'Die gesamte grüne Insel im Blick'
+                    duration: 7
                 },
                 {
+                    // 6. China – Jasminblüte
                     name: 'China – Jasminblüte',
                     subtitle: 'Mo Li Hua',
                     lat: 33.0,
@@ -260,20 +260,19 @@
                     heading: 0,
                     pitch: -55,
                     roll: 0,
-                    duration: 8,
-                    description: 'China – Reich der Mitte'
+                    duration: 8
                 },
                 {
-                    name: 'Afrika – Rückkehr',
+                    // 7. Südafrika – Baba Yetu
+                    name: 'Südafrika',
                     subtitle: 'Baba Yetu',
-                    lat: 2.0,
-                    lon: 22.0,
-                    altitude: 3500000,
+                    lat: -28.0,
+                    lon: 25.0,
+                    altitude: 2500000,
                     heading: 0,
                     pitch: -60,
                     roll: 0,
-                    duration: 9,
-                    description: 'Der ganze afrikanische Kontinent'
+                    duration: 9
                 }
             ];
 
@@ -315,7 +314,7 @@
                 }
             }
 
-            // Fly to destination – Norden immer oben (heading = 0), Kamera blickt zur Erde
+            // Fly to destination – Norden immer oben, Kamera blickt zur Erde
             function flyToDestination(index) {
                 if (index < 0 || index >= destinations.length) return;
 
@@ -331,25 +330,22 @@
                 viewer.camera.flyTo({
                     destination: Cesium.Cartesian3.fromDegrees(dest.lon, dest.lat, dest.altitude),
                     orientation: {
-                        heading: Cesium.Math.toRadians(dest.heading),  // 0 = Norden oben
-                        pitch: Cesium.Math.toRadians(dest.pitch),      // negativ = Blick zur Erde
+                        heading: Cesium.Math.toRadians(dest.heading),
+                        pitch: Cesium.Math.toRadians(dest.pitch),
                         roll: Cesium.Math.toRadians(dest.roll || 0)
                     },
                     duration: dest.duration,
                     easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT,
                     complete: function() {
                         animationInProgress = false;
-                        // Nach Ankunft: Kamera festhalten – Norden bleibt oben!
                         lockCameraNorthDown(dest);
                     }
                 });
             }
 
-            // Kamera fixieren: Norden oben, Blick zur Erde (kein sanftes Drehen mehr)
+            // Kamera fixieren: Norden oben, Blick zur Erde
             function lockCameraNorthDown(dest) {
                 cancelOrbit();
-
-                // Kamera einmalig korrekt setzen
                 viewer.camera.setView({
                     destination: Cesium.Cartesian3.fromDegrees(dest.lon, dest.lat, dest.altitude),
                     orientation: {
@@ -376,7 +372,7 @@
                 }
             }
 
-            // Auto-Play: Nach jeder Station automatisch weiter
+            // Auto-Play
             const originalFlyTo = flyToDestination;
             flyToDestination = function(index) {
                 cancelScheduledFlight();
