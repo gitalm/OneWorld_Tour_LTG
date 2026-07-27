@@ -75,7 +75,7 @@
             position: absolute;
             bottom: 20px;
             right: 20px;
-            z-index: 1000;
+            z-index: 1001;
             display: flex;
             gap: 10px;
         }
@@ -127,6 +127,83 @@
             opacity: 0.7;
             color: #4CAF50;
         }
+
+        /* ============ SLIDESHOW OVERLAY ============ */
+        #slideshowOverlay {
+            position: absolute;
+            bottom: -400px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            max-width: 90vw;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 16px;
+            z-index: 1002;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: bottom 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+            overflow: hidden;
+            padding: 0;
+        }
+        #slideshowOverlay.visible {
+            bottom: 90px;
+        }
+        #slideshowOverlay .slideshow-title {
+            text-align: center;
+            color: #FFD700;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1em;
+            padding: 12px 20px 4px 20px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        #slideshowOverlay .slideshow-images {
+            display: flex;
+            gap: 10px;
+            padding: 10px 20px 16px 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        #slideshowOverlay .slideshow-images img,
+        #slideshowOverlay .slideshow-images video {
+            width: 170px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+            background: #1a1a1a;
+        }
+        #slideshowOverlay .slideshow-images video {
+            background: #000;
+        }
+        #slideshowClose {
+            position: absolute;
+            top: 8px;
+            right: 14px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1003;
+            pointer-events: auto;
+        }
+        #slideshowClose:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 650px) {
+            #slideshowOverlay {
+                width: 95vw;
+            }
+            #slideshowOverlay .slideshow-images img,
+            #slideshowOverlay .slideshow-images video {
+                width: 130px;
+                height: 85px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -153,9 +230,16 @@
         <button id="btnNext" title="Nächste Station">▶▶</button>
     </div>
 
+    <!-- SLIDESHOW OVERLAY -->
+    <div id="slideshowOverlay">
+        <button id="slideshowClose" title="Schließen">✕</button>
+        <div class="slideshow-title" id="slideshowTitle"></div>
+        <div class="slideshow-images" id="slideshowImages"></div>
+    </div>
+
     <script>
         (async function initCesium() {
-            // Cesium Ion Token (ersetzen mit deinem eigenen Token)
+            // Cesium Ion Token
             Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
 
             // Initialize Cesium Viewer
@@ -187,11 +271,10 @@
             viewer.cesiumWidget.creditContainer.style.display = 'none';
 
             // ========================================
-            // DESTINATIONS (Norden ist immer oben!)
+            // DESTINATIONS (mit Medien für die Slideshow)
             // ========================================
             const destinations = [
                 {
-                    // 1. Afrika – Kilimandscharo Region (Tansania/Kenia)
                     name: 'Afrika – Kilimandscharo Region',
                     subtitle: 'Africa (Toto)',
                     lat: -3.07,
@@ -200,10 +283,15 @@
                     heading: 0,
                     pitch: -50,
                     roll: 0,
-                    duration: 8
+                    duration: 8,
+                    slideshowTitle: '🇹🇿 Tansania – Am Fuße des Kilimandscharo',
+                    media: [
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Mount_Kilimanjaro.jpg/320px-Mount_Kilimanjaro.jpg', alt: 'Kilimandscharo' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Zebras_Serengeti.JPG/320px-Zebras_Serengeti.JPG', alt: 'Serengeti' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Maasai_women_and_children.jpg/320px-Maasai_women_and_children.jpg', alt: 'Massai' }
+                    ]
                 },
                 {
-                    // 2. Norwegen – Fjorde & Berge (weiter östlich, weg von der Nordsee)
                     name: 'Norwegen – Fjorde & Berge',
                     subtitle: 'Peer Gynt Suite (Grieg)',
                     lat: 62.0,
@@ -212,10 +300,15 @@
                     heading: 0,
                     pitch: -55,
                     roll: 0,
-                    duration: 8
+                    duration: 8,
+                    slideshowTitle: '🇳🇴 Norwegen – Land der Fjorde',
+                    media: [
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Geirangerfjord_%286-2007%29.jpg/320px-Geirangerfjord_%286-2007%29.jpg', alt: 'Geirangerfjord' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Trolltunga.jpg/320px-Trolltunga.jpg', alt: 'Trolltunga' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Edvard_Grieg_%281888%29_by_Elliot_%26_Fry.jpg/320px-Edvard_Grieg_%281888%29_by_Elliot_%26_Fry.jpg', alt: 'Edvard Grieg' }
+                    ]
                 },
                 {
-                    // 3. Ungarn – Puszta
                     name: 'Ungarn – Puszta',
                     subtitle: 'Ungarischer Tanz Nr. 5 (Brahms)',
                     lat: 47.2,
@@ -224,10 +317,15 @@
                     heading: 0,
                     pitch: -50,
                     roll: 0,
-                    duration: 7
+                    duration: 7,
+                    slideshowTitle: '🇭🇺 Ungarn – Puszta & Budapest',
+                    media: [
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Budapest_Parliament_4604.jpg/320px-Budapest_Parliament_4604.jpg', alt: 'Parlament Budapest' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Hortob%C3%A1gy-%C3%B6szt%C3%B6n_1.jpg/320px-Hortob%C3%A1gy-%C3%B6szt%C3%B6n_1.jpg', alt: 'Puszta' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Johannes_Brahms_1853.jpg/320px-Johannes_Brahms_1853.jpg', alt: 'Johannes Brahms' }
+                    ]
                 },
                 {
-                    // 4. Südamerika – Brasilien (Richtung Rio de Janeiro)
                     name: 'Südamerika – Brasilien',
                     subtitle: 'Sunday in Rio / La Cucaracha',
                     lat: -18.0,
@@ -236,10 +334,15 @@
                     heading: 0,
                     pitch: -55,
                     roll: 0,
-                    duration: 8
+                    duration: 8,
+                    slideshowTitle: '🇧🇷 Brasilien – Karneval & Samba',
+                    media: [
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Cidade_Maravilhosa.jpg/320px-Cidade_Maravilhosa.jpg', alt: 'Rio de Janeiro' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Carnaval_Rio_2012.jpg/320px-Carnaval_Rio_2012.jpg', alt: 'Karneval Rio' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Amazonas-Fluss.jpg/320px-Amazonas-Fluss.jpg', alt: 'Amazonas' }
+                    ]
                 },
                 {
-                    // 5. Irland – Grüne Insel
                     name: 'Irland – Grüne Insel',
                     subtitle: 'Irish Suite (Anderson)',
                     lat: 53.0,
@@ -248,10 +351,15 @@
                     heading: 0,
                     pitch: -55,
                     roll: 0,
-                    duration: 7
+                    duration: 7,
+                    slideshowTitle: '🇮🇪 Irland – Die grüne Insel',
+                    media: [
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Cliffs_of_Moher_%28South%29.jpg/320px-Cliffs_of_Moher_%28South%29.jpg', alt: 'Cliffs of Moher' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Concertina.jpg/320px-Concertina.jpg', alt: 'Concertina' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Irish_dancers_at_the_St._Patrick%27s_Day_parade_in_Dublin.jpg/320px-Irish_dancers_at_the_St._Patrick%27s_Day_parade_in_Dublin.jpg', alt: 'Irish Dance' }
+                    ]
                 },
                 {
-                    // 6. China – Jasminblüte
                     name: 'China – Jasminblüte',
                     subtitle: 'Mo Li Hua',
                     lat: 33.0,
@@ -260,10 +368,15 @@
                     heading: 0,
                     pitch: -55,
                     roll: 0,
-                    duration: 8
+                    duration: 8,
+                    slideshowTitle: '🇨🇳 China – Reich der Mitte',
+                    media: [
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/The_Great_Wall_of_China_at_Jinshanling.jpg/320px-The_Great_Wall_of_China_at_Jinshanling.jpg', alt: 'Chinesische Mauer' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Jasminum_polyanthum.jpg/320px-Jasminum_polyanthum.jpg', alt: 'Jasminblüte' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Shanghai_Skyline%2C_Dec2014.jpg/320px-Shanghai_Skyline%2C_Dec2014.jpg', alt: 'Shanghai' }
+                    ]
                 },
                 {
-                    // 7. Südafrika – Baba Yetu
                     name: 'Südafrika',
                     subtitle: 'Baba Yetu',
                     lat: -28.0,
@@ -272,13 +385,20 @@
                     heading: 0,
                     pitch: -60,
                     roll: 0,
-                    duration: 9
+                    duration: 9,
+                    slideshowTitle: '🇿🇦 Südafrika – Regenbogennation',
+                    media: [
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Table_Mountain_DanieVDM.jpg/320px-Table_Mountain_DanieVDM.jpg', alt: 'Tafelberg' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/South_African_choir.jpg/320px-South_African_choir.jpg', alt: 'Südafrikanischer Chor' },
+                        { type: 'image', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Kruger_National_Park_%282848258721%29.jpg/320px-Kruger_National_Park_%282848258721%29.jpg', alt: 'Krüger Nationalpark' }
+                    ]
                 }
             ];
 
             let currentStation = 0;
             let isAutoPlaying = true;
             let flightTimeout = null;
+            let slideshowTimeout = null;
             let animationInProgress = false;
 
             // UI Elements
@@ -286,6 +406,9 @@
             const progressFill = document.getElementById('progressFill');
             const btnPlay = document.getElementById('btnPlay');
             const stationItems = document.querySelectorAll('#stationList .station');
+            const slideshowOverlay = document.getElementById('slideshowOverlay');
+            const slideshowTitle = document.getElementById('slideshowTitle');
+            const slideshowImages = document.getElementById('slideshowImages');
 
             function updateUI() {
                 stationNameEl.textContent = `${destinations[currentStation].name} – ${destinations[currentStation].subtitle}`;
@@ -297,6 +420,53 @@
                     if (index < currentStation) item.classList.add('done');
                 });
             }
+
+            // Slideshow-Funktionen
+            function showSlideshow(dest) {
+                if (!dest.media || dest.media.length === 0) return;
+
+                slideshowTitle.textContent = dest.slideshowTitle || '';
+                slideshowImages.innerHTML = '';
+
+                dest.media.forEach(item => {
+                    if (item.type === 'image') {
+                        const img = document.createElement('img');
+                        img.src = item.src;
+                        img.alt = item.alt || '';
+                        img.title = item.alt || '';
+                        img.loading = 'lazy';
+                        img.onerror = function() {
+                            this.style.display = 'none';
+                        };
+                        slideshowImages.appendChild(img);
+                    } else if (item.type === 'video') {
+                        const video = document.createElement('video');
+                        video.src = item.src;
+                        video.controls = false;
+                        video.muted = true;
+                        video.loop = true;
+                        video.playsInline = true;
+                        video.title = item.alt || '';
+                        video.onerror = function() {
+                            this.style.display = 'none';
+                        };
+                        slideshowImages.appendChild(video);
+                        video.play().catch(() => {});
+                    }
+                });
+
+                slideshowOverlay.classList.add('visible');
+            }
+
+            function hideSlideshow() {
+                slideshowOverlay.classList.remove('visible');
+                if (slideshowTimeout) {
+                    clearTimeout(slideshowTimeout);
+                    slideshowTimeout = null;
+                }
+            }
+
+            document.getElementById('slideshowClose').addEventListener('click', hideSlideshow);
 
             let orbitAnimation = null;
 
@@ -314,12 +484,13 @@
                 }
             }
 
-            // Fly to destination – Norden immer oben, Kamera blickt zur Erde
+            // Fly to destination
             function flyToDestination(index) {
                 if (index < 0 || index >= destinations.length) return;
 
                 cancelScheduledFlight();
                 cancelOrbit();
+                hideSlideshow();
 
                 currentStation = index;
                 animationInProgress = true;
@@ -339,11 +510,15 @@
                     complete: function() {
                         animationInProgress = false;
                         lockCameraNorthDown(dest);
+
+                        // Nach 1 Sekunde Slideshow einblenden
+                        slideshowTimeout = setTimeout(() => {
+                            showSlideshow(dest);
+                        }, 1000);
                     }
                 });
             }
 
-            // Kamera fixieren: Norden oben, Blick zur Erde
             function lockCameraNorthDown(dest) {
                 cancelOrbit();
                 viewer.camera.setView({
@@ -359,6 +534,7 @@
             function nextStation() {
                 if (animationInProgress) return;
                 cancelScheduledFlight();
+                hideSlideshow();
                 if (currentStation < destinations.length - 1) {
                     flyToDestination(currentStation + 1);
                 }
@@ -367,6 +543,7 @@
             function prevStation() {
                 if (animationInProgress) return;
                 cancelScheduledFlight();
+                hideSlideshow();
                 if (currentStation > 0) {
                     flyToDestination(currentStation - 1);
                 }
@@ -377,13 +554,16 @@
             flyToDestination = function(index) {
                 cancelScheduledFlight();
                 cancelOrbit();
+                hideSlideshow();
                 originalFlyTo(index);
 
                 const dest = destinations[index];
                 if (isAutoPlaying && index < destinations.length - 1) {
+                    // Slideshow bleibt ~6 Sekunden sichtbar, dann Weiterflug
+                    const slideShowDuration = 6000;
                     flightTimeout = setTimeout(() => {
                         if (isAutoPlaying) nextStation();
-                    }, (dest.duration + 5) * 1000);
+                    }, (dest.duration * 1000) + slideShowDuration);
                 }
             };
 
@@ -435,6 +615,9 @@
                             cancelScheduledFlight();
                         }
                         break;
+                    case 'Escape':
+                        hideSlideshow();
+                        break;
                 }
             });
 
@@ -445,7 +628,6 @@
 
             console.log('🌍 One World Tour bereit!');
             console.log('Stationen:', destinations.map(d => d.name).join(' → '));
-            console.log('Norden ist immer oben | Kamera blickt stets zur Erde');
         })();
     </script>
 </body>
