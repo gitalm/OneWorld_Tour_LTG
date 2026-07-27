@@ -156,30 +156,34 @@
         // Cesium Ion Token (kostenlos unter https://ion.cesium.com/ registrieren)
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1NGU3YzJkYi1mNTRjLTQxNDAtYTA2Ny02OTJlMjFiMzljOWUiLCJpZCI6NDQ1MTUxLCJzdWIiOiJBbEoiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiT25lV29ybGQiLCJpYXQiOjE3ODE2MDQwNTl9.bWQpQQXdJoZ1CLp190p4YJkS9AtMi0m99vyVMOOejYY';
 
-        // Initialize Cesium Viewer
-        const viewer = new Cesium.Viewer('cesiumContainer', {
-            animation: false,
-            timeline: false,
-            baseLayerPicker: false,
-            fullscreenButton: false,
-            homeButton: false,
-            sceneModePicker: false,
-            navigationHelpButton: false,
-            geocoder: false,
-            selectionIndicator: false,
-            infoBox: false
-        });
+// Initialize Cesium Viewer
+const viewer = new Cesium.Viewer('cesiumContainer', {
+    animation: false,
+    timeline: false,
+    baseLayerPicker: false,
+    fullscreenButton: false,
+    homeButton: false,
+    sceneModePicker: false,
+    navigationHelpButton: false,
+    geocoder: false,
+    selectionIndicator: false,
+    infoBox: false
+});
 
-        // Remove default imagery and add a nicer one
-        viewer.imageryLayers.removeAll();
-        viewer.imageryLayers.addImageryProvider(
-            new Cesium.IonImageryProvider({ assetId: 3812 }) // Sentinel-2 (schönere Erde)
-        );
+// Einfachen Karten-Layer ohne zusätzliche Assets verwenden
+viewer.imageryLayers.removeAll();
+viewer.imageryLayers.addImageryProvider(
+    new Cesium.OpenStreetMapImageryProvider({
+        url: 'https://tile.openstreetmap.org/',
+        maximumLevel: 18
+    })
+);
 
-        // Enable stars and atmosphere
-        viewer.scene.skyAtmosphere.show = true;
-        viewer.scene.globe.enableLighting = true;
-        viewer.scene.globe.showGroundAtmosphere = true;
+// Enable atmosphere
+viewer.scene.skyAtmosphere.show = true;
+viewer.scene.globe.enableLighting = true;
+viewer.scene.globe.showGroundAtmosphere = true;
+
 
         // Flight destinations with coordinates and viewing angles
         // Each destination: { name, lat, lon, altitude (meters), heading (degrees), pitch (negative = looking down), roll, duration (seconds) }
