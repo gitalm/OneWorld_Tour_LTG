@@ -694,6 +694,52 @@ const destinations = [
             console.log('🌍 One World Tour bereit!');
             console.log('Bilder aus:', IMG);
             console.log('Start: Weltansicht – erster Klick startet Reise nach Afrika');
+        // ============================================================
+// 🎯 KOORDINATEN-ANZEIGE (für Debugging)
+// ============================================================
+const coordDisplay = document.createElement('div');
+coordDisplay.id = 'coordDisplay';
+coordDisplay.style.cssText = `
+    position: absolute;
+    bottom: 120px;
+    left: 20px;
+    background: rgba(0,0,0,0.7);
+    color: #FFD700;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    z-index: 999;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,215,0,0.3);
+    line-height: 1.6;
+    max-width: 280px;
+`;
+document.body.appendChild(coordDisplay);
+
+// Live-Update der Koordinaten
+viewer.scene.postRender.addEventListener(() => {
+    const camera = viewer.camera;
+    const cartesian = camera.position;
+    const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    
+    const lat = Cesium.Math.toDegrees(cartographic.latitude).toFixed(2);
+    const lon = Cesium.Math.toDegrees(cartographic.longitude).toFixed(2);
+    const alt = (cartographic.height / 1000).toFixed(0); // in km
+    const pitch = Cesium.Math.toDegrees(camera.pitch).toFixed(1);
+    const heading = Cesium.Math.toDegrees(camera.heading).toFixed(1);
+    
+    coordDisplay.innerHTML = `
+        <strong>📍 Aktuelle Position:</strong><br>
+        lat: ${lat}<br>
+        lon: ${lon}<br>
+        altitude: ${alt}000<br>
+        pitch: ${pitch}<br>
+        heading: ${heading}
+    `;
+});
+
+        
         })();
     </script>
 </body>
