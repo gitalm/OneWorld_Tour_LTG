@@ -100,7 +100,7 @@
             position: absolute; inset: 0;
             width: 100%; height: 100%;
             object-fit: contain;
-            opacity: 0; transition: opacity 1s ease;
+            opacity: 0; transition: opacity 2s ease-in-out;
             background: transparent; 
         }
         #slideshowImageContainer img.active { opacity: 1; }
@@ -206,10 +206,10 @@
             // ============================================================
             const SLIDESHOW_CYCLES  = 1;       // Wie oft die Bilder durchlaufen (2 = 2x alle)
             const SLIDESHOW_INTERVAL = 10000;  // Wechselgeschwindigkeit in ms (2500 = 2,5 s)
-            const SLIDESHOW_DELAY    = 1500;   // Wartezeit nach Ankunft bis Slideshow startet (ms)
+            const SLIDESHOW_DELAY    = 3000;   // Wartezeit nach Ankunft bis Slideshow startet (ms)
             const SLIDESHOW_HIDE_DELAY = 500; // Wartezeit bis Slideshow ausgeblendet wird (ms)
             const CRAWL_DURATION     = 45;    // Dauer des Star-Wars-Textes in Sekunden
-            const ROTATION_SPEED     = 0.03;  // Wie schnell die Erde rotiert (Grad/s)
+            const ROTATION_SPEED     = 0.3;  // Wie schnell die Erde rotiert (Grad/s)
             const EARTH_ALTITUDE     = 20000000; // Höhe der Kamera im Finale (Meter)
             const EARTH_PITCH        = -65;   // Neigung im Finale (Grad)
 
@@ -243,7 +243,7 @@ const destinations = [
     {
         name: 'Africa (Toto)',
         subtitle: '',
-        lat: -3.0, lon: 37.0, altitude: 900000, heading: 0, pitch: -52, duration: 8,
+        lat: -9.95, lon: 38.41, altitude: 1334000, heading: 0, pitch: -52, duration: 8,
         media: [
             IMG + 'africa1.jpg',
             IMG + 'africa2.jpg',
@@ -253,7 +253,7 @@ const destinations = [
     {
         name: 'Norwegen – Peer Gynt Suite (Grieg)',
         subtitle: '',
-        lat: 60.0, lon: 10.0, altitude: 900000, heading: 0, pitch: -48, duration: 8,
+        lat: 54.21, lon: 9.02, altitude: 810000, heading: 360.0, pitch: -48, duration: 8,
         media: [
             IMG + 'norway1.jpg',
             IMG + 'norway2.jpg',
@@ -263,7 +263,7 @@ const destinations = [
     {
         name: 'Ungarn – Ungarischer Tanz Nr. 5 (Brahms)',
         subtitle: '',
-        lat: 47.0, lon: 19.2, altitude: 480000, heading: 0, pitch: -48, duration: 7,
+        lat: 42.68, lon: 18.68, altitude: 480000, heading: 360.0, pitch: -48, duration: 7,
         media: [
             IMG + 'hungary1.jpg',
             IMG + 'hungary2.jpg',
@@ -273,7 +273,7 @@ const destinations = [
     {
         name: 'Südamerika – Sunday in Rio / La Cucaracha',
         subtitle: '',
-        lat: -15.0, lon: -50.0, altitude: 2800000, heading: 0, pitch: -52, duration: 8,
+        lat: -23.48, lon: -49.41, altitude: 4101000, heading: 2.5, pitch: -64.1, duration: 8,
         media: [
             IMG + 'brasil1.jpg',
             IMG + 'brasil2.jpg',
@@ -283,7 +283,7 @@ const destinations = [
     {
         name: 'Irland – Irish Suite (Anderson)',
         subtitle: '',
-        lat: 53.5, lon: -8.5, altitude: 700000, heading: 0, pitch: -50, duration: 7,
+        lat: 46.83, lon: -7.36, altitude: 698000, heading: 0, pitch: -50, duration: 7,
         media: [
             IMG + 'ireland1.jpg',
             IMG + 'ireland2.jpg',
@@ -293,7 +293,7 @@ const destinations = [
     {
         name: 'China – Mo Li Hua',
         subtitle: '',
-        lat: 32.0, lon: 112.0, altitude: 2400000, heading: 0, pitch: -55, duration: 8,
+        lat: 14.93, lon: 110.13, altitude: 1524000, heading: 360.0, pitch: -55.1, duration: 8,
         media: [
             IMG + 'china1.jpg',
             IMG + 'china2.jpg',
@@ -303,7 +303,7 @@ const destinations = [
     {
         name: 'Südafrika - Baba Yetu',
         subtitle: '',
-        lat: -30.0, lon: 25.0, altitude: 2200000, heading: 0, pitch: -55, duration: 9,
+        lat: -39.97, lon: 22.35, altitude: 1443000, heading: 360.0, pitch: -55, duration: 9,
         media: [
             IMG + 'safrica1.jpg',
             IMG + 'safrica2.jpg',
