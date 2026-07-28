@@ -91,18 +91,30 @@
             transition: opacity 0.6s ease;
         }
         #slideshowOverlay.visible { opacity: 1; pointer-events: auto; }
-        #slideshowImageContainer {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
-            background: transparent;
-        }
-        #slideshowImageContainer img {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
-            object-fit: contain;
-            opacity: 0; transition: opacity 4s ease-in-out;
-            background: transparent; 
-        }
+		#slideshowImageContainer {
+		    position: absolute;
+		    inset: 0;
+		    width: 100%;
+		    height: 100%;
+		    background: transparent;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		}
+		#slideshowImageContainer img {
+		    position: absolute;
+		    top: 5%;
+		    left: 5%;
+		    width: 90%;
+		    height: 90%;
+		    object-fit: cover;
+		    object-position: center;
+		    border-radius: 12px;
+		    opacity: 0;
+		    transition: opacity 4s ease-in-out;
+		    background: transparent;
+		}
+
         #slideshowImageContainer img.active { opacity: 1; }
         #slideshowDots {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -209,9 +221,9 @@
             const SLIDESHOW_DELAY    = 3000;   // Wartezeit nach Ankunft bis Slideshow startet (ms)
             const SLIDESHOW_HIDE_DELAY = 500; // Wartezeit bis Slideshow ausgeblendet wird (ms)
             const CRAWL_DURATION     = 45;    // Dauer des Star-Wars-Textes in Sekunden
-            const ROTATION_SPEED     = 0.3;  // Wie schnell die Erde rotiert (Grad/s)
-            const EARTH_ALTITUDE     = 20000000; // Höhe der Kamera im Finale (Meter)
-            const EARTH_PITCH        = -65;   // Neigung im Finale (Grad)
+            const ROTATION_SPEED     = 1.0;  // Wie schnell die Erde rotiert (Grad/s)
+            const EARTH_ALTITUDE     = 8000000; // Höhe der Kamera im Finale (Meter)
+            const EARTH_PITCH        = -35;   // Neigung im Finale (Grad)
 
             // ============================================================
             // 🖼️ LOKALE BILDER
