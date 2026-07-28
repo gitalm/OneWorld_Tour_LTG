@@ -736,14 +736,16 @@
             // ============================================================
             // START: Weltansicht, warten auf Klick
             // ============================================================
+			// Option 1: Näher heran
 			viewer.camera.setView({
-			    destination: Cesium.Cartesian3.fromDegrees(15, 0, 15000000),
+			    destination: Cesium.Cartesian3.fromDegrees(15, 0, 8000000),
 			    orientation: {
 			        heading: Cesium.Math.toRadians(0),
-			        pitch: Cesium.Math.toRadians(-35),
+			        pitch: Cesium.Math.toRadians(-40),
 			        roll: Cesium.Math.toRadians(0)
 			    }
 			});
+		
 
 
             updateUI();
