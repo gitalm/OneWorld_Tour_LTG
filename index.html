@@ -100,7 +100,7 @@
             position: absolute; inset: 0;
             width: 100%; height: 100%;
             object-fit: contain;
-            opacity: 0; transition: opacity 2s ease-in-out;
+            opacity: 0; transition: opacity 4s ease-in-out;
             background: transparent; 
         }
         #slideshowImageContainer img.active { opacity: 1; }
@@ -678,6 +678,25 @@ const destinations = [
                     btnNext.textContent = 'Nächste Station ▶';
                 }
             }, 300);
+            
+            document.addEventListener('keydown', (e) => {
+			    if (e.key === 'ArrowRight' || e.key === ' ') {
+			        e.preventDefault();
+			        if (isFinaleActive) {
+			            if (!finaleOverlay.classList.contains('visible')) showDreamCrawl();
+			            else hideFinale();
+			        } else {
+			            nextStation();
+			        }
+			    } else if (e.key === 'ArrowLeft') {
+			        e.preventDefault();
+			        prevStation();
+			    } else if (e.key === 'Escape') {
+			        if (finaleOverlay.classList.contains('visible')) hideFinale();
+			        else { hideSlideshow(); waitingForUser = true; updateUI(); }
+			    }
+			});
+
 
             // ============================================================
             // START: Weltansicht, warten auf Klick
