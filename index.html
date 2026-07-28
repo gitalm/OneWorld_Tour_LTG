@@ -272,78 +272,78 @@
             // ============================================================
             // 🌍 DESTINATIONS
             // ============================================================
-const destinations = [
-    {
-        name: 'Africa (Toto)',
-        subtitle: '',
-        lat: -9.95, lon: 38.41, altitude: 1334000, heading: 0, pitch: -52, duration: 8,
-        media: [
-            IMG + 'africa1.jpg',
-            IMG + 'africa2.jpg',
-            IMG + 'africa3.jpg'
-        ]
-    },
-    {
-        name: 'Norwegen – Peer Gynt Suite (Grieg)',
-        subtitle: '',
-        lat: 54.21, lon: 9.02, altitude: 810000, heading: 360.0, pitch: -48, duration: 8,
-        media: [
-            IMG + 'norway1.jpg',
-            IMG + 'norway2.jpg',
-            IMG + 'norway3.jpg'
-        ]
-    },
-    {
-        name: 'Ungarn – Ungarischer Tanz Nr. 5 (Brahms)',
-        subtitle: '',
-        lat: 42.68, lon: 18.68, altitude: 480000, heading: 360.0, pitch: -48, duration: 7,
-        media: [
-            IMG + 'hungary1.jpg',
-            IMG + 'hungary2.jpg',
-            IMG + 'hungary3.jpg'
-        ]
-    },
-    {
-        name: 'Südamerika – Sunday in Rio / La Cucaracha',
-        subtitle: '',
-        lat: -23.48, lon: -49.41, altitude: 4101000, heading: 2.5, pitch: -64.1, duration: 8,
-        media: [
-            IMG + 'brasil1.jpg',
-            IMG + 'brasil2.jpg',
-            IMG + 'brasil3.jpg'
-        ]
-    },
-    {
-        name: 'Irland – Irish Suite (Anderson)',
-        subtitle: '',
-        lat: 46.83, lon: -7.36, altitude: 698000, heading: 0, pitch: -50, duration: 7,
-        media: [
-            IMG + 'ireland1.jpg',
-            IMG + 'ireland2.jpg',
-            IMG + 'ireland3.jpg'
-        ]
-    },
-    {
-        name: 'China – Mo Li Hua',
-        subtitle: '',
-        lat: 14.93, lon: 110.13, altitude: 1524000, heading: 360.0, pitch: -55.1, duration: 8,
-        media: [
-            IMG + 'china1.jpg',
-            IMG + 'china2.jpg',
-            IMG + 'china3.jpg'
-        ]
-    },
-    {
-        name: 'Südafrika - Baba Yetu',
-        subtitle: '',
-        lat: -39.97, lon: 22.35, altitude: 1443000, heading: 360.0, pitch: -55, duration: 9,
-        media: [
-            IMG + 'safrica1.jpg',
-            IMG + 'safrica2.jpg',
-            IMG + 'safrica3.jpg'
-        ]
-    }
-];
+			const destinations = [
+			    {
+			        name: 'Africa (Toto)',
+			        subtitle: '',
+			        lat: -9.95, lon: 38.41, altitude: 1334000, heading: 0, pitch: -52, duration: 8,
+			        media: [
+			            IMG + 'africa1.jpg',
+			            IMG + 'africa2.jpg',
+			            IMG + 'africa3.jpg'
+			        ]
+			    },
+			    {
+			        name: 'Norwegen – Peer Gynt Suite (Grieg)',
+			        subtitle: '',
+			        lat: 54.21, lon: 9.02, altitude: 810000, heading: 360.0, pitch: -48, duration: 8,
+			        media: [
+			            IMG + 'norway1.jpg',
+			            IMG + 'norway2.jpg',
+			            IMG + 'norway3.jpg'
+			        ]
+			    },
+			    {
+			        name: 'Ungarn – Ungarischer Tanz Nr. 5 (Brahms)',
+			        subtitle: '',
+			        lat: 42.68, lon: 18.68, altitude: 480000, heading: 360.0, pitch: -48, duration: 7,
+			        media: [
+			            IMG + 'hungary1.jpg',
+			            IMG + 'hungary2.jpg',
+			            IMG + 'hungary3.jpg'
+			        ]
+			    },
+			    {
+			        name: 'Südamerika – Sunday in Rio / La Cucaracha',
+			        subtitle: '',
+			        lat: -23.48, lon: -49.41, altitude: 4101000, heading: 2.5, pitch: -64.1, duration: 8,
+			        media: [
+			            IMG + 'brasil1.jpg',
+			            IMG + 'brasil2.jpg',
+			            IMG + 'brasil3.jpg'
+			        ]
+			    },
+			    {
+			        name: 'Irland – Irish Suite (Anderson)',
+			        subtitle: '',
+			        lat: 46.83, lon: -7.36, altitude: 698000, heading: 0, pitch: -50, duration: 7,
+			        media: [
+			            IMG + 'ireland1.jpg',
+			            IMG + 'ireland2.jpg',
+			            IMG + 'ireland3.jpg'
+			        ]
+			    },
+			    {
+			        name: 'China – Mo Li Hua',
+			        subtitle: '',
+			        lat: 14.93, lon: 110.13, altitude: 1524000, heading: 360.0, pitch: -55.1, duration: 8,
+			        media: [
+			            IMG + 'china1.jpg',
+			            IMG + 'china2.jpg',
+			            IMG + 'china3.jpg'
+			        ]
+			    },
+			    {
+			        name: 'Südafrika - Baba Yetu',
+			        subtitle: '',
+			        lat: -39.97, lon: 22.35, altitude: 1443000, heading: 360.0, pitch: -55, duration: 9,
+			        media: [
+			            IMG + 'safrica1.jpg',
+			            IMG + 'safrica2.jpg',
+			            IMG + 'safrica3.jpg'
+			        ]
+			    }
+			];
 
 
             // ============================================================
@@ -734,14 +734,15 @@ const destinations = [
             // ============================================================
             // START: Weltansicht, warten auf Klick
             // ============================================================
-            viewer.camera.setView({
-                destination: Cesium.Cartesian3.fromDegrees(15, 5, 22000000),
-                orientation: {
-                    heading: Cesium.Math.toRadians(0),
-                    pitch: Cesium.Math.toRadians(-60),
-                    roll: Cesium.Math.toRadians(0)
-                }
-            });
+			viewer.camera.setView({
+			    destination: Cesium.Cartesian3.fromDegrees(15, 0, 15000000),
+			    orientation: {
+			        heading: Cesium.Math.toRadians(0),
+			        pitch: Cesium.Math.toRadians(-35),
+			        roll: Cesium.Math.toRadians(0)
+			    }
+			});
+
 
             updateUI();
 
