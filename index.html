@@ -235,6 +235,27 @@
             viewer.scene.globe.enableLighting = true;
             viewer.scene.globe.showGroundAtmosphere = true;
             viewer.cesiumWidget.creditContainer.style.display = 'none';
+            
+            // ============================================================
+			// 🖼️ BILDER IN CACHE PRELOADEN
+			// ============================================================
+			function preloadImages() {
+			    destinations.forEach((dest, index) => {
+			        if (dest.media && dest.media.length > 0) {
+			            dest.media.forEach((src) => {
+			                const img = new Image();
+			                img.src = src;
+			                img.onerror = () => console.warn(`⚠️ Bild nicht gefunden: ${src}`);
+			                img.onload = () => console.log(`✓ Bild geladen: ${src}`);
+			            });
+			        }
+			    });
+			    console.log('📦 Alle Bilder werden im Hintergrund geladen...');
+			}
+			
+			// Bilder preloaden (nach kurzer Verzögerung, damit Cesium zuerst lädt)
+			setTimeout(preloadImages, 1000);
+
 
             // ============================================================
             // 🌍 DESTINATIONS
